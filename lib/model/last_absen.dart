@@ -2,6 +2,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class LastAbsen {
+  int? idRoster;
+  String? kodeRoster;
+  String? tglRoster;
+  String? jamKerja;
   String? lastAbsen;
   String? lastNew;
   String? tanggal;
@@ -10,16 +14,26 @@ class LastAbsen {
   Presensi? presensiMasuk;
   Presensi? presensiPulang;
   LastAbsen(
-      {this.lastAbsen,
+      {
+      this.idRoster,
+      this.kodeRoster,
+      this.tglRoster,
+      this.jamKerja,
+      this.lastAbsen,
       this.lastNew,
       this.tanggal,
       this.masuk,
       this.pulang,
       this.presensiMasuk,
-      this.presensiPulang});
+      this.presensiPulang
+      });
 
   factory LastAbsen.fromJson(Map<String, dynamic> object) {
     return LastAbsen(
+      idRoster: object['idRoster'],
+      kodeRoster: object['kodeRoster'],
+      tglRoster: object['tglRoster'],
+      jamKerja: object['jamKerja'],
       lastAbsen: object['lastAbsen'],
       lastNew: object['lastNew'],
       tanggal: object['tanggal'],
@@ -35,7 +49,7 @@ class LastAbsen {
   }
 
   static Future<LastAbsen> apiAbsenTigaHari(String _nik) async {
-    String apiUrl = "https://abpjobsite.com/absen/get/lastAbsen?nik=" + _nik;
+    String apiUrl = "https://lp.abpjobsite.com/api/lastAbsen?nik=" + _nik;
     var apiResult = await http.get(Uri.parse(apiUrl));
     var jsonObject = json.decode(apiResult.body);
     var lastAbsen = LastAbsen.fromJson(jsonObject);

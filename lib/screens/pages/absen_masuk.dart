@@ -20,7 +20,10 @@ typedef Convert = Pointer<Uint32> Function(Pointer<Uint8>, Pointer<Uint8>, Point
 class AbsenMasuk extends StatefulWidget {
   final String nik;
   final String status;
-  const AbsenMasuk({Key? key,required this.nik,required this.status}) : super(key: key);
+  final String lat;
+  final String lng;
+  final String id_roster;
+  const AbsenMasuk({Key? key,required this.nik,required this.status,required this.lat,required this.lng,required this.id_roster}) : super(key: key);
   @override
   _AbsenMasukState createState() => _AbsenMasukState();
 }
@@ -393,7 +396,7 @@ class _AbsenMasukState extends State<AbsenMasuk> {
     absensiPulang(_files);
   }
   absensiPulang(File files)async{
-    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files);
+    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files,widget.lat,widget.lng,widget.id_roster);
     print("UploadResult ${uploadRes}");
     if(uploadRes!=null){
       visible = false;

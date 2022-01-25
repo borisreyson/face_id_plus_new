@@ -20,8 +20,11 @@ typedef Convert = Pointer<Uint32> Function(Pointer<Uint8>, Pointer<Uint8>, Point
 class AbsenPulang extends StatefulWidget {
   final String nik;
   final String status;
+  final String lat;
+  final String lng;
+  final String id_roster;
 
-  const AbsenPulang({ Key? key,required this.nik,required this.status }) : super(key: key);
+  const AbsenPulang({ Key? key,required this.nik,required this.status,required this.lat,required this.lng,required this.id_roster }) : super(key: key);
 
   @override
   _AbsenPulangState createState() => _AbsenPulangState();
@@ -210,8 +213,11 @@ class _AbsenPulangState extends State<AbsenPulang> {
   }
 
   Future<void> processImage(InputImage inputImage) async {
-    if (isBusy) return;
-    isBusy = true;
+    print("Process1");
+    // if (isBusy) return;
+    // isBusy = true;
+    print("Process");
+
     final faces = await faceDetector.processImage(inputImage);
     if (inputImage.inputImageData?.size != null &&
         inputImage.inputImageData?.imageRotation != null) {
@@ -222,7 +228,6 @@ class _AbsenPulangState extends State<AbsenPulang> {
           customPaint = CustomPaint(painter: painter);
       intImage =  await convertImage(_savedImage);
       _cameraInitialized=false;
-      _stopLiveFeed();
       savingImage();
     } else {
       customPaint = null;
@@ -332,7 +337,7 @@ class _AbsenPulangState extends State<AbsenPulang> {
       absensiPulang(_files);
   }
   absensiPulang(File files)async{
-    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files);
+    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files,widget.lat,widget.lng,widget.id_roster);
     print("UploadResult ${uploadRes}");
     if(uploadRes!=null){
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green,
@@ -340,6 +345,8 @@ class _AbsenPulangState extends State<AbsenPulang> {
       visible = false;
       detect=true;
       isBusy=false;
+      // _stopLiveFeed();
+
       setState(() {
       });
     }

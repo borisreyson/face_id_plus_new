@@ -3,6 +3,7 @@ import 'dart:io' show Platform;
 import 'dart:typed_data';
 import 'package:face_id_plus/model/last_absen.dart';
 import 'package:face_id_plus/model/map_area.dart';
+import 'package:face_id_plus/model/tigahariabsen.dart';
 import 'package:face_id_plus/screens/pages/absen_masuk.dart';
 import 'package:face_id_plus/screens/pages/absen_pulang.dart';
 import 'package:face_id_plus/screens/pages/area.dart';
@@ -51,6 +52,8 @@ class _HomePageState extends State<HomePage> {
   String? _detik;
   String? _tanggal;
   String? nama, nik;
+  String? _jam_kerja;
+  String? id_roster;
   int? isLogin = 0;
   double _masuk = 0.0;
   double _pulang = 0.0;
@@ -67,6 +70,7 @@ class _HomePageState extends State<HomePage> {
   late Set<Marker> markers = {};
   late Marker marker;
   bool lokasiPalsu = false;
+  Widget loader = const Center(child: CircularProgressIndicator());
   late Timer timerss;
   static const CameraPosition _kGooglePlex =
       CameraPosition(target: LatLng(-0.5634222, 117.0139606), zoom: 14.2746);
@@ -84,7 +88,7 @@ class _HomePageState extends State<HomePage> {
           iosMapLocation = true;
         }
         CameraPosition cameraPosition =
-            CameraPosition(target: myLocation!, zoom: 19.3756);
+            CameraPosition(target: myLocation!, zoom: 17.5756);
         return await _googleMapController
             .animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
       }
@@ -179,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                   ? _headerContent()
                   : _headerIos()
               : const Padding(
-                  padding: EdgeInsets.only(top: 40.0),
+                  padding: EdgeInsets.only(top: 30.0),
                   child: CircularProgressIndicator(),
                 ),
           const SizedBox(height: 8),
@@ -217,7 +221,7 @@ class _HomePageState extends State<HomePage> {
               points: pointAbp,
               strokeWidth: 2,
               strokeColor: Colors.red,
-              fillColor: Colors.white.withOpacity(0.3)));
+              fillColor: Colors.green.withOpacity(0.25)));
 
           if (Platform.isAndroid) {
             if (!serviceEnable) {
@@ -346,20 +350,21 @@ class _HomePageState extends State<HomePage> {
     return GoogleMap(
       initialCameraPosition: _kGooglePlex,
       mapType: MapType.normal,
-      onMapCreated: (GoogleMapController controller) {
+      onMapCreated: (GoogleMapController controller) async {
         _map_controller.complete(controller);
-        _googleMapController = controller;
+        _googleMapController = await controller;
         _googleMaps = true;
         setState(() {
           marker = Marker(
-            markerId: const MarkerId('abpenergy'),
-            position: const LatLng(-0.5634222, 117.0139606),
+            markerId: MarkerId('abpenergy'),
+            position: LatLng(-0.5634222, 117.0139606),
             icon: customIcon,
             infoWindow: const InfoWindow(
               title: 'PT Alamjaya Bara Pratama',
             ),
           );
-          markers.add(marker);
+           markers.add(marker);
+          _googleMapController.showMarkerInfoWindow(MarkerId("abpenergy"));
         });
       },
       polygons: Set<Polygon>.of(_shape),
@@ -380,24 +385,9 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             children: <Widget>[
               Row(
-                children: const [
-                  Padding(
-                    padding: EdgeInsets.only(left: 20.0),
-                    child: Text(
-                      "Selamat Datang,",
-                      style: TextStyle(
-                          fontFamily: 'Montserrat',
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15.0),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 40.0),
+                    padding: const EdgeInsets.only(left: 20.0),
                     child: Text(
                       "$nama",
                       style: const TextStyle(
@@ -411,7 +401,7 @@ class _HomePageState extends State<HomePage> {
               Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 60.0),
+                    padding: const EdgeInsets.only(left: 30.0),
                     child: Text(
                       "$nik",
                       style: const TextStyle(
@@ -493,10 +483,31 @@ class _HomePageState extends State<HomePage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
+            roster(),
             (Platform.isAndroid) ? _jamWidget() : _jamIos(),
-            (outside) ? _btnAbsen() : diluarArea()
+            (outside) ? _btnAbsen() : diluarArea(),
           ],
         ),
+      ),
+    );
+  }
+  Widget roster(){
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Text("Jadwal",style: TextStyle(color: Colors.black87),),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Text("S1",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors.blueAccent),),
+              ),
+            ],
+          ),
+          Text("$_tanggal"),
+        ],
       ),
     );
   }
@@ -549,7 +560,7 @@ class _HomePageState extends State<HomePage> {
         ),
         Center(
           child: Text(
-            "$_tanggal",
+             (_jam_kerja!=null)?"$_jam_kerja":"",
             style: const TextStyle(color: Colors.black87),
           ),
         ),
@@ -645,10 +656,16 @@ class _HomePageState extends State<HomePage> {
                                                   ? IosMasuk(
                                                       nik: nik!,
                                                       status: "Masuk",
+                                                      lat: "${myLocation?.latitude}",
+                                                      lng: "${myLocation?.longitude}",
+                                                      id_roster: id_roster!,
                                                     )
-                                                  : AbsenMasuk(
+                                                  : IosMasuk(
                                                       nik: nik!,
                                                       status: "Masuk",
+                                                      lat: "${myLocation?.latitude}",
+                                                      lng: "${myLocation?.longitude}",
+                                                      id_roster: id_roster!,
                                                     )))
                                   .then((value) => getPref(context));
                             }
@@ -683,9 +700,15 @@ class _HomePageState extends State<HomePage> {
                                               ? IosPulang(
                                                   nik: nik!,
                                                   status: "Pulang",
+                                                  lat: "${myLocation?.latitude}",
+                                                  lng: "${myLocation?.longitude}",
+                                                  id_roster: id_roster!,
                                                 )
-                                              : AbsenPulang(
-                                                  nik: nik!, status: "Pulang")))
+                                              : IosPulang(
+                                                  nik: nik!, status: "Pulang",
+                                                  lat: "${myLocation?.latitude}",
+                                                  lng: "${myLocation?.longitude}",
+                                                  id_roster: id_roster!,)))
                                   .then((value) => getPref(context));
                             }
                           : null,
@@ -819,6 +842,8 @@ class _HomePageState extends State<HomePage> {
     var lastAbsen = await LastAbsen.apiAbsenTigaHari(_nik);
     print("LASTAbsen ${lastAbsen.lastNew}");
     if (lastAbsen != null) {
+      _jam_kerja=lastAbsen.jamKerja;
+      id_roster = "${lastAbsen.idRoster}";
       if (lastAbsen.lastAbsen != null) {
         var absenTerakhir = lastAbsen.lastAbsen;
         var jamAbsen = lastAbsen.presensiMasuk;

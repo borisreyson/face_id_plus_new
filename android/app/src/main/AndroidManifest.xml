@@ -21,7 +21,7 @@
         android:name="com.google.mlkit.vision.DEPENDENCIES"
         android:value="ica" />
    <application
-        android:label="face_id_plus"
+        android:label="Face Id Plus ABP"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data

@@ -20,8 +20,11 @@ typedef Convert = Pointer<Uint32> Function(
 class IosMasuk extends StatefulWidget {
   final String nik;
   final String status;
+  final String lat;
+  final String lng;
+  final String id_roster;
 
-  const IosMasuk({Key? key, required this.nik, required this.status})
+  const IosMasuk({Key? key, required this.nik, required this.status,required this.lat,required this.lng,required this.id_roster})
       : super(key: key);
 
   @override
@@ -386,7 +389,7 @@ class _IosMasukState extends State<IosMasuk> {
   }
 
   absensiPulang(File files) async {
-    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files);
+    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files,widget.lat,widget.lng,widget.id_roster);
     if (uploadRes != null) {
       isBusy=false;
       print("UploadResult ${uploadRes.image}");

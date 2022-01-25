@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'package:face_id_plus/model/upload.dart';
 import 'package:face_id_plus/screens/pages/painters/face_detector_painter.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
@@ -20,8 +21,11 @@ typedef Convert = Pointer<Uint32> Function(
 class IosPulang extends StatefulWidget {
   final String nik;
   final String status;
+  final String lat;
+  final String lng;
+  final String id_roster;
 
-  const IosPulang({Key? key, required this.nik, required this.status})
+  const IosPulang({Key? key, required this.nik, required this.status,required this.lat,required this.lng,required this.id_roster})
       : super(key: key);
 
   @override
@@ -386,11 +390,20 @@ class _IosPulangState extends State<IosPulang> {
   }
 
   absensiPulang(File files) async {
-    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files);
+    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files,widget.lat,widget.lng,widget.id_roster);
     if (uploadRes != null) {
       print("UploadResult ${uploadRes.image}");
+      print("UploadResult ${uploadRes.res}");
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green,
           content: Text("Absen Di Daftar!",style: TextStyle(color: Colors.white),)));
+      // Flushbar(
+      //   flushbarPosition: FlushbarPosition.TOP,
+      //   title: "Absensi",
+      //   message: "Absen Di Daftar!",
+      //   duration: Duration(seconds: 2),
+      //   backgroundColor: Colors.red,
+      //     boxShadows: [BoxShadow(color: Color(0xFD41F1F), offset: Offset(0.0, 2.0), blurRadius: 3.0,)]
+      // ).show(context);
       visible = false;
       detect = true;
       waiting=false;
