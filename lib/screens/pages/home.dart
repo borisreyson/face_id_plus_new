@@ -52,6 +52,7 @@ class _HomePageState extends State<HomePage> {
   String? nama, nik;
   String? _jam_kerja;
   String? id_roster;
+  String? connStat;
   int? isLogin = 0;
   double _masuk = 0.0;
   double _pulang = 0.0;
@@ -193,6 +194,9 @@ class _HomePageState extends State<HomePage> {
     return FutureBuilder<List<MapAreModel>>(
       future: _loadArea(),
       builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+        if (snapshot.connectionState == ConnectionState.none) {
+          return Text("${snapshot.connectionState}");
+        }
         if (!serviceEnable) {
           outside = false;
           _diluarAbp = 1.0;
