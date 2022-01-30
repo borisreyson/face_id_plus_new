@@ -100,9 +100,13 @@ class _IosMasukState extends State<IosMasuk> {
   @override
   void initState() {
     initializeCamera();
+    if(_cameraInitialized){
+
     conv = convertImageLib
         .lookup<NativeFunction<convert_func>>('convertImage')
         .asFunction<Convert>();
+    
+    }
     super.initState();
   }
 
@@ -138,7 +142,7 @@ class _IosMasukState extends State<IosMasuk> {
           color: const Color(0xf0D9D9D9),
           child: (visible) ? cameraFrame() : imgFrame()),
       floatingActionButton: (visible)
-          ? FloatingActionButton(
+          ? (_cameraInitialized)?FloatingActionButton(
         onPressed: (isBusy)?null:() async {
           isBusy=true;
           // _processImageStream(_savedImage);
@@ -152,6 +156,9 @@ class _IosMasukState extends State<IosMasuk> {
       )
           : Visibility(
         visible: false,
+        child: Container(),
+      ): Visibility(
+        visible: visible,
         child: Container(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

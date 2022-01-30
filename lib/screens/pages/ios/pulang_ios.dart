@@ -24,7 +24,13 @@ class IosPulang extends StatefulWidget {
   final String lng;
   final String id_roster;
 
-  const IosPulang({Key? key, required this.nik, required this.status,required this.lat,required this.lng,required this.id_roster})
+  const IosPulang(
+      {Key? key,
+      required this.nik,
+      required this.status,
+      required this.lat,
+      required this.lng,
+      required this.id_roster})
       : super(key: key);
 
   @override
@@ -35,7 +41,7 @@ class _IosPulangState extends State<IosPulang> {
   final DynamicLibrary convertImageLib = Platform.isAndroid
       ? DynamicLibrary.open("libconvertImage.so")
       : DynamicLibrary.process();
-  bool waiting=false;
+  bool waiting = false;
   late Convert conv;
   XFile? savFile;
   late imglib.Image img;
@@ -100,9 +106,11 @@ class _IosPulangState extends State<IosPulang> {
   @override
   void initState() {
     initializeCamera();
-    conv = convertImageLib
-        .lookup<NativeFunction<convert_func>>('convertImage')
-        .asFunction<Convert>();
+    if (_cameraInitialized) {
+      conv = convertImageLib
+          .lookup<NativeFunction<convert_func>>('convertImage')
+          .asFunction<Convert>();
+    }
     super.initState();
   }
 
@@ -134,24 +142,31 @@ class _IosPulangState extends State<IosPulang> {
               Navigator.maybePop(context);
             },
           )),
-      body: (waiting)?Center(child: CircularProgressIndicator()):Container(
-          color: const Color(0xf0D9D9D9),
-          child: (visible) ? cameraFrame() : imgFrame()),
+      body: (waiting)
+          ? Center(child: CircularProgressIndicator())
+          : Container(
+              color: const Color(0xf0D9D9D9),
+              child: (visible) ? cameraFrame() : imgFrame()),
       floatingActionButton: (visible)
-          ? FloatingActionButton(
-              onPressed: (isBusy)?null:() async {
-                isBusy=false;
-                // _processImageStream(_savedImage);
-                waiting=true;
-                savFile = await _cameraController?.takePicture();
-                print("Gambar $savFile");
-                saveImage();
-              },
+          ? (_cameraInitialized)?FloatingActionButton(
+              onPressed: (isBusy)
+                  ? null
+                  : () async {
+                      isBusy = false;
+                      // _processImageStream(_savedImage);
+                      waiting = true;
+                      savFile = await _cameraController?.takePicture();
+                      print("Gambar $savFile");
+                      saveImage();
+                    },
               tooltip: 'Scan Wajah',
               child: const Icon(Icons.camera),
+            ):Visibility(
+              visible: false,
+              child: Container(),
             )
           : Visibility(
-              visible: false,
+              visible: visible,
               child: Container(),
             ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -377,8 +392,9 @@ class _IosPulangState extends State<IosPulang> {
     print("Filess ${_files}");
     absensiPulang(_files);
   }
+
   saveImage() async {
-    visible=false;
+    visible = false;
     externalDirectory = await getApplicationDocumentsDirectory();
     String directoryPath = '${externalDirectory.path}/FaceIdPlus';
     await Directory(directoryPath).create(recursive: true);
@@ -389,12 +405,17 @@ class _IosPulangState extends State<IosPulang> {
   }
 
   absensiPulang(File files) async {
-    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files,widget.lat,widget.lng,widget.id_roster);
+    var uploadRes = await Upload.uploadApi(widget.nik, widget.status, files,
+        widget.lat, widget.lng, widget.id_roster);
     if (uploadRes != null) {
       print("UploadResult ${uploadRes.image}");
       print("UploadResult ${uploadRes.res}");
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(backgroundColor: Colors.green,
-          content: Text("Absen Di Daftar!",style: TextStyle(color: Colors.white),)));
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Colors.green,
+          content: Text(
+            "Absen Di Daftar!",
+            style: TextStyle(color: Colors.white),
+          )));
       // Flushbar(
       //   flushbarPosition: FlushbarPosition.TOP,
       //   title: "Absensi",
@@ -405,8 +426,8 @@ class _IosPulangState extends State<IosPulang> {
       // ).show(context);
       visible = false;
       detect = true;
-      waiting=false;
-      isBusy=false;
+      waiting = false;
+      isBusy = false;
       setState(() {});
     }
   }
