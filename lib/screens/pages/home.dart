@@ -111,6 +111,8 @@ class _HomePageState extends State<HomePage> {
     _jam = "";
     _menit = "";
     _detik = "";
+    jamMasuk = "";
+    jamPulang = "";
     setState(() {
       getPref(context);
       DateFormat fmt = DateFormat("dd MMMM yyyy");
@@ -227,6 +229,8 @@ class _HomePageState extends State<HomePage> {
             } else {
               _requestLocation();
               _googleMaps = false;
+              locatePosition();
+
               return const Center(child: CircularProgressIndicator());
             }
           } else if (Platform.isIOS) {
@@ -493,13 +497,13 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            children: [
+            children: const [
               Text(
                 "Jadwal",
                 style: TextStyle(color: Colors.black87),
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: EdgeInsets.only(left: 8.0),
                 child: Text(
                   "S1",
                   style: TextStyle(
@@ -867,8 +871,10 @@ class _HomePageState extends State<HomePage> {
             _enPulang = false;
             _pulang = 0.0;
             jamPulang = "${jamAbsen?.jam}";
+            jamMasuk = "";
           } else {
             jamMasuk = "${jamAbsen?.jam}";
+            jamPulang = "";
             outside = false;
             _enMasuk = false;
             _enPulang = true;
@@ -876,6 +882,8 @@ class _HomePageState extends State<HomePage> {
             _pulang = 1.0;
           }
         } else if (absenTerakhir == "Pulang") {
+          jamMasuk = "";
+          jamPulang = "";
           outside = false;
           _enMasuk = true;
           _enPulang = false;
@@ -883,6 +891,8 @@ class _HomePageState extends State<HomePage> {
           _pulang = 0.0;
         }
       } else {
+        jamMasuk = "";
+        jamPulang = "";
         _enMasuk = true;
         outside = false;
         _enPulang = false;
