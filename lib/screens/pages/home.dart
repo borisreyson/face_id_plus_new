@@ -3,13 +3,11 @@ import 'dart:io' show Platform;
 import 'dart:typed_data';
 import 'package:face_id_plus/model/last_absen.dart';
 import 'package:face_id_plus/model/map_area.dart';
-import 'package:face_id_plus/model/tigahariabsen.dart';
-import 'package:face_id_plus/screens/pages/absen_masuk.dart';
-import 'package:face_id_plus/screens/pages/absen_pulang.dart';
 import 'package:face_id_plus/screens/pages/area.dart';
 import 'package:face_id_plus/screens/pages/ios/pulang_ios.dart';
 import 'package:face_id_plus/screens/pages/painters/face_detector_painter.dart';
 import 'package:face_id_plus/screens/pages/profile.dart';
+import 'package:face_id_plus/services/net_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
@@ -100,6 +98,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    NetworkCheck().checkConnection(context);
     setCustomMapPin();
     if (Platform.isAndroid) {
       _requestLocation();
@@ -178,14 +177,7 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: const Color(0xFFFFFFFF),
       body: Column(
         children: <Widget>[
-          (_googleMaps)
-              ? (Platform.isAndroid)
-                  ? _headerContent()
-                  : _headerIos()
-              : const Padding(
-                  padding: EdgeInsets.only(top: 30.0),
-                  child: CircularProgressIndicator(),
-                ),
+          (Platform.isAndroid) ? _headerContent() : _headerIos(),
           const SizedBox(height: 8),
           Expanded(
             child: IntrinsicHeight(child: _futureBuilder()),
@@ -302,8 +294,10 @@ class _HomePageState extends State<HomePage> {
               onPressed: () async {
                 bool reqService = await iosLocation.Location().requestService();
                 if (reqService) {
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => const HomePage()));
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomePage()));
                 }
               },
               child: const Text("Aktifkan Lokasi?")),
@@ -363,7 +357,7 @@ class _HomePageState extends State<HomePage> {
               title: 'PT Alamjaya Bara Pratama',
             ),
           );
-           markers.add(marker);
+          markers.add(marker);
           _googleMapController.showMarkerInfoWindow(MarkerId("abpenergy"));
         });
       },
@@ -491,7 +485,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
-  Widget roster(){
+
+  Widget roster() {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -499,10 +494,19 @@ class _HomePageState extends State<HomePage> {
         children: [
           Row(
             children: [
-              Text("Jadwal",style: TextStyle(color: Colors.black87),),
+              Text(
+                "Jadwal",
+                style: TextStyle(color: Colors.black87),
+              ),
               Padding(
                 padding: const EdgeInsets.only(left: 8.0),
-                child: Text("S1",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold,color: Colors.blueAccent),),
+                child: Text(
+                  "S1",
+                  style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent),
+                ),
               ),
             ],
           ),
@@ -560,7 +564,7 @@ class _HomePageState extends State<HomePage> {
         ),
         Center(
           child: Text(
-             (_jam_kerja!=null)?"$_jam_kerja":"",
+            (_jam_kerja != null) ? "$_jam_kerja" : "",
             style: const TextStyle(color: Colors.black87),
           ),
         ),
@@ -626,6 +630,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    NetworkCheck().listener.cancel();
     timerss.cancel();
     super.dispose();
   }
@@ -656,15 +661,19 @@ class _HomePageState extends State<HomePage> {
                                                   ? IosMasuk(
                                                       nik: nik!,
                                                       status: "Masuk",
-                                                      lat: "${myLocation?.latitude}",
-                                                      lng: "${myLocation?.longitude}",
+                                                      lat:
+                                                          "${myLocation?.latitude}",
+                                                      lng:
+                                                          "${myLocation?.longitude}",
                                                       id_roster: id_roster!,
                                                     )
                                                   : IosMasuk(
                                                       nik: nik!,
                                                       status: "Masuk",
-                                                      lat: "${myLocation?.latitude}",
-                                                      lng: "${myLocation?.longitude}",
+                                                      lat:
+                                                          "${myLocation?.latitude}",
+                                                      lng:
+                                                          "${myLocation?.longitude}",
                                                       id_roster: id_roster!,
                                                     )))
                                   .then((value) => getPref(context));
@@ -694,22 +703,24 @@ class _HomePageState extends State<HomePage> {
                       onPressed: _enPulang
                           ? () {
                               Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => (Platform.isIOS)
-                                              ? IosPulang(
-                                                  nik: nik!,
-                                                  status: "Pulang",
-                                                  lat: "${myLocation?.latitude}",
-                                                  lng: "${myLocation?.longitude}",
-                                                  id_roster: id_roster!,
-                                                )
-                                              : IosPulang(
-                                                  nik: nik!, status: "Pulang",
-                                                  lat: "${myLocation?.latitude}",
-                                                  lng: "${myLocation?.longitude}",
-                                                  id_roster: id_roster!,)))
-                                  .then((value) => getPref(context));
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => (Platform.isIOS)
+                                          ? IosPulang(
+                                              nik: nik!,
+                                              status: "Pulang",
+                                              lat: "${myLocation?.latitude}",
+                                              lng: "${myLocation?.longitude}",
+                                              id_roster: id_roster!,
+                                            )
+                                          : IosPulang(
+                                              nik: nik!,
+                                              status: "Pulang",
+                                              lat: "${myLocation?.latitude}",
+                                              lng: "${myLocation?.longitude}",
+                                              id_roster: id_roster!,
+                                            ))).then(
+                                  (value) => getPref(context));
                             }
                           : null,
                     ),
@@ -842,7 +853,7 @@ class _HomePageState extends State<HomePage> {
     var lastAbsen = await LastAbsen.apiAbsenTigaHari(_nik);
     print("LASTAbsen ${lastAbsen.lastNew}");
     if (lastAbsen != null) {
-      _jam_kerja=lastAbsen.jamKerja;
+      _jam_kerja = lastAbsen.jamKerja;
       id_roster = "${lastAbsen.idRoster}";
       if (lastAbsen.lastAbsen != null) {
         var absenTerakhir = lastAbsen.lastAbsen;
@@ -865,7 +876,7 @@ class _HomePageState extends State<HomePage> {
             _pulang = 1.0;
           }
         } else if (absenTerakhir == "Pulang") {
-            outside = false;
+          outside = false;
           _enMasuk = true;
           _enPulang = false;
           _masuk = 1.0;
@@ -873,7 +884,7 @@ class _HomePageState extends State<HomePage> {
         }
       } else {
         _enMasuk = true;
-            outside = false;
+        outside = false;
         _enPulang = false;
         _masuk = 1.0;
         _pulang = 0.0;
