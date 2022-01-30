@@ -1,7 +1,6 @@
 import 'dart:ffi';
 import 'package:face_id_plus/model/upload.dart';
 import 'package:face_id_plus/screens/pages/painters/face_detector_painter.dart';
-import 'package:flushbar/flushbar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';

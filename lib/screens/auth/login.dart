@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:face_id_plus/model/face_login_model.dart';
 import 'package:face_id_plus/screens/pages/home.dart';
+import 'package:face_id_plus/services/net_check.dart';
 import 'package:face_id_plus/splash.dart';
 import 'package:flutter/material.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,6 +30,7 @@ class _FormLoginState extends State<FormLogin> {
       RoundedLoadingButtonController();
   @override
   void initState() {
+    NetworkCheck().checkConnection(context);
     _passwordVisible = true;
     getPref(context);
     _usernameFocus = FocusNode();
@@ -35,6 +40,8 @@ class _FormLoginState extends State<FormLogin> {
 
   @override
   void dispose() {
+    NetworkCheck().listener.cancel();
+    print("network status ${NetworkCheck().net}");
     _usernameFocus.dispose();
     _passwordFocus.dispose();
     _formKey.currentState?.dispose();
@@ -51,41 +58,40 @@ class _FormLoginState extends State<FormLogin> {
       FaceModel.loginApiFace(username, password).then((value) {
         faceModel = value;
         if (faceModel != null) {
-          if(faceModel!.datalogin==null){
-          _usernameFocus.requestFocus();
-          Future.delayed(const Duration(milliseconds: 1000), () {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Username/ Nik Atau Password Salah!!")));
-            _roundedController.error();
-            _usernameController.clear();
-            _passwordController.clear();
+          if (faceModel!.datalogin == null) {
+            _usernameFocus.requestFocus();
             Future.delayed(const Duration(milliseconds: 1000), () {
-              _roundedController.reset();
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  content: Text("Username/ Nik Atau Password Salah!!")));
+              _roundedController.error();
+              _usernameController.clear();
+              _passwordController.clear();
+              Future.delayed(const Duration(milliseconds: 1000), () {
+                _roundedController.reset();
+              });
             });
-          });
-          }else{
-
-          Datalogin datalogin = faceModel!.datalogin!;
-          setPref(
-              1,
-              datalogin.nik!,
-              datalogin.nama!,
-              datalogin.departemen!,
-              datalogin.devisi,
-              datalogin.jabatan,
-              datalogin.flag.toString(),
-              datalogin.showAbsen,
-              datalogin.perusahaan.toString());
-          Future.delayed(const Duration(milliseconds: 1000), () {
-            _roundedController.success();
+          } else {
+            Datalogin datalogin = faceModel!.datalogin!;
+            setPref(
+                1,
+                datalogin.nik!,
+                datalogin.nama!,
+                datalogin.departemen!,
+                datalogin.devisi,
+                datalogin.jabatan,
+                datalogin.flag.toString(),
+                datalogin.showAbsen,
+                datalogin.perusahaan.toString());
             Future.delayed(const Duration(milliseconds: 1000), () {
-              Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(
-                      builder: (BuildContext context) => const HomePage()),
-                  (context) => false);
+              _roundedController.success();
+              Future.delayed(const Duration(milliseconds: 1000), () {
+                Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => const HomePage()),
+                    (context) => false);
+              });
             });
-          });
           }
         } else {
           _usernameFocus.requestFocus();
