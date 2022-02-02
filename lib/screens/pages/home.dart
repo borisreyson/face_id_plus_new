@@ -53,6 +53,7 @@ class _HomePageState extends State<HomePage> {
   String? _jam_kerja;
   String? id_roster;
   String? connStat;
+  String? kode_roster;
   int? isLogin = 0;
   double _masuk = 0.0;
   double _pulang = 0.0;
@@ -114,6 +115,7 @@ class _HomePageState extends State<HomePage> {
     _detik = "";
     jamMasuk = "";
     jamPulang = "";
+    kode_roster = "";
     setState(() {
       getPref(context);
       DateFormat fmt = DateFormat("dd MMMM yyyy");
@@ -501,16 +503,16 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            children: const [
-              Text(
+            children:  [
+              const Text(
                 "Jadwal",
                 style: TextStyle(color: Colors.black87),
               ),
               Padding(
-                padding: EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 8.0),
                 child: Text(
-                  "S1",
-                  style: TextStyle(
+                  "$kode_roster",
+                  style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                       color: Colors.blueAccent),
@@ -862,6 +864,7 @@ class _HomePageState extends State<HomePage> {
     print("LASTAbsen ${lastAbsen.lastNew}");
     if (lastAbsen != null) {
       _jam_kerja = lastAbsen.jamKerja;
+      kode_roster = lastAbsen.kodeRoster;
       id_roster = "${lastAbsen.idRoster}";
       if (lastAbsen.lastAbsen != null) {
         var absenTerakhir = lastAbsen.lastAbsen;

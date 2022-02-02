@@ -141,10 +141,10 @@ class _SplashState extends State<Splash> {
   }
 
   Widget _title() {
-    return Padding(
+    return const Padding(
       padding: EdgeInsets.only(left: 30, right: 30),
       child: Text(
-        "ABSENSI",
+        "ABSENSI IO ABP",
         style: TextStyle(
             color: Color(0xFF003F63),
             fontSize: 30,
