@@ -287,9 +287,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         const Center(child: Text("GPS anda Masih Mati.")),
-        const Center(
-          child: Text(
-              "Aplikasi membutuhkan Lokasi anda untuk mengetahui apakah anda berada di dalam area yang di tentukan!"),
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Center(
+            child: Text(
+                "Aplikasi membutuhkan Lokasi anda untuk mengetahui apakah anda berada di dalam area yang di tentukan!"),
+          ),
         ),
         Center(
             child: Image.asset(

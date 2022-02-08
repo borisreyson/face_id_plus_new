@@ -25,19 +25,19 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>We Need Storage access for images while uploading</string>
+	<string>enable storage service allows us to temporarily save images during image upload</string>
 	<key>NSCameraUsageDescription</key>
-	<string>We Need Camera Permission to take your photo as attendance report</string>
+	<string>enable camera service allows us to take pictures for attendance</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>We need your location to know you are in the specified area or not</string>
+	<string>enable Location services lets us show you when inside the office area</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>We need your location to know you are in the specified area or not</string>
+	<string>enable Location services lets us show you when inside the office area</string>
 	<key>NSLocationUsageDescription</key>
-	<string>We need your location to know you are in the specified area or not</string>
+	<string>enable Location services lets us show you when inside the office area</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>We need your location to know you are in the specified area or not</string>
+	<string>enable Location services lets us show you when inside the office area</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>We Need Storage access for images while uploading</string>
+	<string>enable storage service allows us to temporarily save images during image upload</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

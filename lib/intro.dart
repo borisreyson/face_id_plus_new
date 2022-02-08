@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:face_id_plus/screens/pages/cek_lokasi.dart';
 import 'package:face_id_plus/screens/pages/home.dart';
+import 'package:face_id_plus/screens/permission/lokasi.dart';
 import 'package:face_id_plus/splash.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -226,7 +227,12 @@ class _SliderIntroState extends State<SliderIntro> {
         slides: slides,
         doneButtonStyle: nextButtonStyle(),
         onDonePress: () {
+          if(Platform.isAndroid){
           _requestLocation(context);
+          }else if(Platform.isIOS){
+          Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const Lokasi()));
+          }
         },
         showDoneBtn: true,
         showSkipBtn: false,
@@ -339,11 +345,11 @@ class _SliderIntroState extends State<SliderIntro> {
     isLogin = sharedPref.getInt("isLogin") ?? 0;
     // print("LoginStatus $isLogin");
     if (isLogin == 1) {
-      
       Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (BuildContext context) => (enableGPS)? const HomePage() : const LokasiCek() ));
+              builder: (BuildContext context) => 
+              (enableGPS)? const HomePage() : const LokasiCek() ));
     } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const Splash()));
