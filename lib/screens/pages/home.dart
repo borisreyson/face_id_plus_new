@@ -30,6 +30,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool serviceEnable = false;
+  bool statusLokasi = false;
   iosLocation.Location locationIOS = iosLocation.Location();
   late final handler.Permission _permission = handler.Permission.location;
   late handler.PermissionStatus _permissionStatus;
@@ -37,6 +38,7 @@ class _HomePageState extends State<HomePage> {
   String? jamPulang;
   bool _enMasuk = false;
   bool _enPulang = false;
+  bool permanenDitolak = false;
   CustomPaint? customPaint;
   bool _googleMaps = false;
   FaceDetector faceDetector =
@@ -58,6 +60,7 @@ class _HomePageState extends State<HomePage> {
   double _masuk = 0.0;
   double _pulang = 0.0;
   double _diluarAbp = 0.0;
+  String startClock = "20:00";
   bool outside = false;
   late Position currentPosition;
   LatLng? myLocation;
@@ -69,6 +72,7 @@ class _HomePageState extends State<HomePage> {
   late BitmapDescriptor customIcon;
   late Set<Marker> markers = {};
   late Marker marker;
+  late DateTime now;
   bool lokasiPalsu = false;
   Widget loader = const Center(child: CircularProgressIndicator());
   late Timer timerss;
@@ -100,10 +104,18 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    TimeOfDay mulai = TimeOfDay(
+        hour: int.parse(startClock.split(":")[0]),
+        minute: int.parse(startClock.split(":")[1])
+        
+        );
+    print("Jam Sekarang = ${mulai}");
     NetworkCheck().checkConnection(context);
     setCustomMapPin();
     if (Platform.isAndroid) {
       _requestLocation();
+    } else if (Platform.isIOS) {
+      izinTidakAda();
     }
     if (lokasiPalsu == true) {
       appClose();
@@ -119,7 +131,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       getPref(context);
       DateFormat fmt = DateFormat("dd MMMM yyyy");
-      DateTime now = DateTime.now();
+      DateTime old = DateTime.now();
+      now = DateTime(old.year, old.month, old.day, mulai.hour, mulai.minute,10);
+      print("Jam Sekarang = ${now}");
+
       _tanggal = fmt.format(now);
       timerss =
           Timer.periodic(const Duration(seconds: 1), (Timer t) => _getTime());
@@ -203,11 +218,14 @@ class _HomePageState extends State<HomePage> {
           outside = false;
           _diluarAbp = 1.0;
           return enableGPS();
+          print("1");
         }
         if (snapshot.hasData) {
           if (!serviceEnable) {
             outside = false;
             _diluarAbp = 1.0;
+            print("2");
+
             return enableGPS();
           }
           List<LatLng> pointAbp = [];
@@ -225,22 +243,29 @@ class _HomePageState extends State<HomePage> {
 
           if (Platform.isAndroid) {
             if (!serviceEnable) {
+              print("3");
+
               outside = false;
               _diluarAbp = 1.0;
               return enableGPS();
             }
             if (_permissionStatus.isGranted) {
               locatePosition();
+              print("4");
+
               return _loadMaps(_polygons, pointAbp);
             } else {
+              print("5");
+
               _requestLocation();
               _googleMaps = false;
               locatePosition();
-
               return const Center(child: CircularProgressIndicator());
             }
           } else if (Platform.isIOS) {
             if (!serviceEnable) {
+              print("6");
+
               outside = false;
               _diluarAbp = 1.0;
               return enableGPS();
@@ -248,12 +273,20 @@ class _HomePageState extends State<HomePage> {
             if (myLocation == null) {
               iosGetLocation();
               if (iosMapLocation) {
+                print("8");
+
                 locatePosition();
                 return _loadMaps(_polygons, pointAbp);
               } else {
-                locatePosition();
+                if (statusLokasi) {
+                  locatePosition();
+                } else {
+                  return izinLokasi();
+                }
               }
             } else {
+              print("10");
+
               locatePosition();
               return _loadMaps(_polygons, pointAbp);
             }
@@ -262,6 +295,7 @@ class _HomePageState extends State<HomePage> {
           return const Center(child: CircularProgressIndicator());
         } else {
           if (!serviceEnable) {
+            print("11");
             outside = false;
             _diluarAbp = 1.0;
             return enableGPS();
@@ -363,15 +397,16 @@ class _HomePageState extends State<HomePage> {
         _googleMaps = true;
         setState(() {
           marker = Marker(
-            markerId: MarkerId('abpenergy'),
-            position: LatLng(-0.5634222, 117.0139606),
+            markerId: const MarkerId('abpenergy'),
+            position: const LatLng(-0.5634222, 117.0139606),
             icon: customIcon,
             infoWindow: const InfoWindow(
               title: 'PT Alamjaya Bara Pratama',
             ),
           );
           markers.add(marker);
-          _googleMapController.showMarkerInfoWindow(MarkerId("abpenergy"));
+          _googleMapController
+              .showMarkerInfoWindow(const MarkerId("abpenergy"));
         });
       },
       polygons: Set<Polygon>.of(_shape),
@@ -506,7 +541,7 @@ class _HomePageState extends State<HomePage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Row(
-            children:  [
+            children: [
               const Text(
                 "Jadwal",
                 style: TextStyle(color: Colors.black87),
@@ -699,7 +734,7 @@ class _HomePageState extends State<HomePage> {
             : Expanded(
                 child: ElevatedButton(
                 onPressed: null,
-                child: Text("${jamMasuk}"),
+                child: Text("$jamMasuk"),
               )),
         (_enPulang)
             ? Expanded(
@@ -741,8 +776,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               )
             : Expanded(
-                child: ElevatedButton(
-                    onPressed: null, child: Text("${jamPulang}")))
+                child:
+                    ElevatedButton(onPressed: null, child: Text("$jamPulang")))
       ],
     );
   }
@@ -779,9 +814,9 @@ class _HomePageState extends State<HomePage> {
 
   void _getTime() {
     setState(() {
-      _jam = "${DateTime.now().hour}".padLeft(2, "0");
-      _menit = "${DateTime.now().minute}".padLeft(2, "0");
-      _detik = "${DateTime.now().second}".padLeft(2, "0");
+      _jam = "${now.hour}".padLeft(2, "0");
+      _menit = "${now.minute}".padLeft(2, "0");
+      _detik = "${now.second}".padLeft(2, "0");
     });
   }
 
@@ -864,7 +899,6 @@ class _HomePageState extends State<HomePage> {
     _diluarAbp = 1.0;
     outside = false;
     var lastAbsen = await LastAbsen.apiAbsenTigaHari(_nik);
-    print("LASTAbsen ${lastAbsen.lastNew}");
     if (lastAbsen != null) {
       _jam_kerja = lastAbsen.jamKerja;
       kode_roster = lastAbsen.kodeRoster;
@@ -872,7 +906,6 @@ class _HomePageState extends State<HomePage> {
       if (lastAbsen.lastAbsen != null) {
         var absenTerakhir = lastAbsen.lastAbsen;
         var jamAbsen = lastAbsen.presensiMasuk;
-        print("LastAbsen : ${lastAbsen.lastAbsen}");
         if (absenTerakhir == "Masuk") {
           if (lastAbsen.lastNew == "Pulang") {
             outside = false;
@@ -929,7 +962,6 @@ class _HomePageState extends State<HomePage> {
     if (isBusy) return;
     isBusy = true;
     final faces = await faceDetector.processImage(inputImage);
-    print('Found ${faces.length} faces');
     if (inputImage.inputImageData?.size != null &&
         inputImage.inputImageData?.imageRotation != null) {
       final painter = FaceDetectorPainter(
@@ -943,12 +975,90 @@ class _HomePageState extends State<HomePage> {
     isBusy = false;
     if (mounted) {
       setState(() {
-        print("Mounted : ${mounted}");
         if (faces.length == 1) {
           Future.delayed(const Duration(milliseconds: 1000));
           Navigator.maybePop(context, inputImage.filePath);
         }
       });
+    }
+  }
+
+  Widget izinLokasi() {
+    return ListView(
+      children: <Widget>[
+        const Center(
+          child: Padding(
+            padding: EdgeInsets.only(bottom: 16.0),
+            child: Text(
+              "GPS",
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        const Center(child: Text("Izin Lokasi (GPS) Tidak Ada.")),
+        const Padding(
+          padding: EdgeInsets.all(10.0),
+          child: Center(
+            child: Text(
+                "Aplikasi membutuhkan Lokasi anda untuk mengetahui apakah anda berada di dalam area yang di tentukan!"),
+          ),
+        ),
+        Center(
+            child: Image.asset(
+          "assets/images/abp_maps.png",
+          width: 200,
+          height: 200,
+        )),
+        const Center(child: Text("Area Lokasi yang dimaksud")),
+        (permanenDitolak)
+            ? Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                    onPressed: () async {
+                      var lokasi =
+                          await handler.Permission.locationWhenInUse.status;
+                      if (lokasi.isPermanentlyDenied) {
+                        await handler.openAppSettings();
+                      }
+                    },
+                    child: const Text("Buka Pengaturan")),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                    onPressed: () async {
+                      var lokasi =
+                          await handler.Permission.locationWhenInUse.status;
+                      if (!lokasi.isGranted) {
+                        await handler.Permission.locationWhenInUse.request();
+                      }
+                    },
+                    child: const Text("Minta Izin?")),
+              ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ElevatedButton(
+              onPressed: () {
+                appClose();
+              },
+              child: const Text("Tidak, Keluar!")),
+        ),
+      ],
+    );
+  }
+
+  izinTidakAda() async {
+    var lokasi = await handler.Permission.locationWhenInUse;
+    var status = await lokasi.status;
+    if (status == handler.PermissionStatus.granted) {
+      statusLokasi = true;
+      permanenDitolak = false;
+    } else if (status == handler.PermissionStatus.denied) {
+      statusLokasi = false;
+      permanenDitolak = false;
+    } else if (status == handler.PermissionStatus.permanentlyDenied) {
+      statusLokasi = false;
+      permanenDitolak = true;
     }
   }
 }

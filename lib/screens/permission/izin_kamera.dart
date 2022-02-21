@@ -89,6 +89,19 @@ class _IzinKameraState extends State<IzinKamera> {
                 const SizedBox(
                   height: 10,
                 ),
+                ElevatedButton.icon(
+                    label: const Text(
+                      "Lewati",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(primary: Colors.red),
+                    onPressed: () {
+                      saveIntro(context);
+                    },
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                    )),
               ]),
         ),
       ),
@@ -119,7 +132,6 @@ class _IzinKameraState extends State<IzinKamera> {
     } else if (status == handler.PermissionStatus.permanentlyDenied) {
       izinStatus = false;
     }
-    print("izinStatus $izinStatus");
     return izinStatus;
   }
 
@@ -148,7 +160,6 @@ class _IzinKameraState extends State<IzinKamera> {
   }
 
   getPref(BuildContext context) async {
-    enableGPS = await Geolocator.isLocationServiceEnabled();
 
     var sharedPref = await SharedPreferences.getInstance();
     isLogin = sharedPref.getInt("isLogin") ?? 0;
@@ -158,7 +169,7 @@ class _IzinKameraState extends State<IzinKamera> {
           context,
           MaterialPageRoute(
               builder: (BuildContext context) =>
-                  (enableGPS) ? const HomePage() : const LokasiCek()));
+                  const HomePage()));
     } else {
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const Splash()));

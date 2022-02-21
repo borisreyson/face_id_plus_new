@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart' as handler;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:location/location.dart' as loc;
 
 class Lokasi extends StatefulWidget {
   const Lokasi({Key? key}) : super(key: key);
@@ -32,8 +33,7 @@ class _LokasiState extends State<Lokasi> {
     var status = await lokasi.status;
     if (status == handler.PermissionStatus.granted) {
       statusLokasi = true;
-    }else
-    if (status == handler.PermissionStatus.denied) {
+    } else if (status == handler.PermissionStatus.denied) {
       statusLokasi = false;
     } else if (status == handler.PermissionStatus.permanentlyDenied) {
       statusLokasi = false;
@@ -49,9 +49,7 @@ class _LokasiState extends State<Lokasi> {
     } else if (mintaIzin == handler.PermissionStatus.permanentlyDenied) {
       await handler.openAppSettings();
     }
-    setState(() {
-      
-    });
+    setState(() {});
   }
 
   @override
@@ -125,9 +123,8 @@ class _LokasiState extends State<Lokasi> {
                               },
                               icon: const Icon(Icons.approval));
                         }
-                      }else{
+                      } else {
                         print("Status Izin = ${snapshot.data}");
-
                       }
                       return Container();
                     }),
@@ -147,7 +144,9 @@ class _LokasiState extends State<Lokasi> {
                               ),
                               style: ElevatedButton.styleFrom(
                                   primary: Colors.white),
-                              onPressed: () {},
+                              onPressed: () {
+                                enableGPS();
+                              },
                               icon: const Icon(
                                 Icons.location_disabled,
                                 color: Colors.red,
@@ -156,10 +155,34 @@ class _LokasiState extends State<Lokasi> {
                       } else {
                         return Container();
                       }
-                    })
+                    }),
+                ElevatedButton.icon(
+                    label: const Text(
+                      "Lewati",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(primary: Colors.red),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            const IzinKamera()));
+                    },
+                    icon: const Icon(
+                      Icons.chevron_right,
+                      color: Colors.white,
+                    )),
               ]),
         ),
       ),
     );
+  }
+
+  enableGPS() async {
+    loc.Location location = loc.Location();
+    if (!await location.serviceEnabled()) {
+      location.requestService();
+    }
   }
 }

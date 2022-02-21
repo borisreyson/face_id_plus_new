@@ -30,7 +30,7 @@ class LastAbsen {
 
   factory LastAbsen.fromJson(Map<String, dynamic> object) {
     return LastAbsen(
-      idRoster: object['idRoster'],
+      idRoster: object ['idRoster'],
       kodeRoster: object['kodeRoster'],
       tglRoster: object['tglRoster'],
       jamKerja: object['jamKerja'],

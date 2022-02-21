@@ -42,12 +42,7 @@ class MyApp extends StatelessWidget {
 
   _mainPage() {
     if (Platform.isAndroid) {
-      return AnimatedSplashScreen(
-          splash: Image.asset('assets/images/ic_abp.png'),
-          duration: 1500,
-          splashTransition: SplashTransition.scaleTransition,
-          nextScreen: const SliderIntro());
-      // Splash();
+          return const SliderIntro();
     } else if (Platform.isIOS) {
       return AnimatedSplashScreen(
           splash: Image.asset('assets/images/ic_abp.png'),
@@ -55,5 +50,6 @@ class MyApp extends StatelessWidget {
           splashTransition: SplashTransition.scaleTransition,
           nextScreen: const SliderIntro());
     }
+    
   }
 }
