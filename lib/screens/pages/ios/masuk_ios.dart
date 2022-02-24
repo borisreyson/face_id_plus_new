@@ -127,7 +127,7 @@ class _IosMasukState extends State<IosMasuk> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text("Absen Pulang"),
+          title: const Text("Absen Masuk"),
           leading: InkWell(
             splashColor: const Color(0xff000000),
             child: const Icon(
