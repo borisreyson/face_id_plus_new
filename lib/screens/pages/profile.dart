@@ -163,27 +163,32 @@ class _ProfileState extends State<Profile> {
     DateFormat fmt = DateFormat("dd MMMM yyyy");
     var tgl = DateTime.parse("${_absen.tanggal}");
     TextStyle _style = const TextStyle(fontSize: 12, color: Colors.white);
-    return Card(
-      elevation: 10,
-      shadowColor: Colors.black87,
-      color: (_absen.status == "Masuk") ? Colors.green : Colors.red,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          imageResolve(_absen.gambar!),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(nama, style: _style),
-              Text("${_absen.status}", style: _style),
-              Text(fmt.format(tgl), style: _style),
-              Text("${_absen.jam}", style: _style),
-              Text("${_absen.nik}", style: _style),
-              Text("${_absen.lupa_absen}", style: _style),
-            ],
-          )
-        ],
+    return InkWell(
+      onTap: () {
+        print("OK");
+      },
+      child: Card(
+        elevation: 10,
+        shadowColor: Colors.black87,
+        color: (_absen.status == "Masuk") ? Colors.green : Colors.red,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            imageResolve(_absen.gambar!),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(nama, style: _style),
+                Text("${_absen.status}", style: _style),
+                Text(fmt.format(tgl), style: _style),
+                Text("${_absen.jam}", style: _style),
+                Text("${_absen.nik}", style: _style),
+                Text("${_absen.lupa_absen}", style: _style),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
@@ -254,7 +259,7 @@ class _ProfileState extends State<Profile> {
     _users.devisi = devisi;
     print("showAbsen $_showAbsen");
 
-    _users.showAbsen = (_showAbsen==null)?0:_showAbsen;
+    _users.showAbsen = (_showAbsen == null) ? 0 : _showAbsen;
 
     return _users;
   }
